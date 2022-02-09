@@ -11,7 +11,24 @@ sigma_sb = 5.67037e-8
 
 class RadiantFlux:
     """
-    Class to determine the radiant flux from Stefan-Boltzmann law
+    Class to determine the radiant flux from Stefan-Boltzmann law. This class contains two methods,
+
+    1- get_radiant_flux()
+
+    2- solve()
+
+    The get_radiant_flux() method requires two float/int type arguments,
+
+    - temperature, and
+    - emissivity.
+
+    Although solve() method requires three parameters,
+
+    - radiant flux,
+    - temperature, and
+    - emissivity.
+
+    One of the three can be left unknown. However, two must be specified as float/int type arguments.
     """
 
     def __init__(self):
@@ -20,7 +37,7 @@ class RadiantFlux:
     @staticmethod
     def get_radiant_flux(temperature: float, emissivity: float) -> float:
         """
-        Function to get the radiant flux value from Stefan-Boltzmann Law.
+        Method to get the radiant flux value from Stefan-Boltzmann Law.
 
         Parameters
         ----------
@@ -44,6 +61,24 @@ class RadiantFlux:
               radiant_flux: Optional[float] = None,
               temperature: Optional[float] = None,
               emissivity: Optional[float] = None) -> Optional[float]:
+        """
+        Method to solve the Stefan-Boltzmann law for one of the three unknown variables.
+
+        Parameters
+        ----------
+        radiant_flux:
+            The radiant flux of the black body.
+        temperature:
+            The temperature of the black body
+        emissivity:
+            The emissivity parameter for the black body.
+
+        Returns
+        -------
+        object:
+            One of the three unknown parameters for Stefan-Boltzmann law.
+
+        """
         r, s, t, e = radiant_flux, sigma_sb, temperature, emissivity
 
         return self.get_radiant_flux(t, e) if r is None else (r * (s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1 if e is None else None

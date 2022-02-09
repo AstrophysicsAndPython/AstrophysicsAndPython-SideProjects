@@ -1,19 +1,48 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Tue Aug  3 17:29:13 2021
-
-@author: astrophysics and python
 """
 
+from typing import Optional
 
-class WienDisplacementLaw:
+wien_constant = 0.0028977729
 
-    def __init__(self):
-        self.wien_constant = 0.0028977729
 
-    def peak_wavelength(self, temperature):
-        return self.wien_constant * temperature**-1
+def get_peak_wavelength(temperature: float) -> float:
+    """
+    Method to determine the peak wavelength for a black body given its temperature.
 
-    def solve(self, wavelength=None, temperature=None):
-        return [self.peak_wavelength(temperature) if wavelength is None else self.wien_constant * wavelength**-1][0]
+    Parameters
+    ----------
+    temperature:
+        The temperature of the black body (in Kelvin).
+
+    Returns
+    -------
+    float:
+        wavelength - The wavelength (in nanometer) corresponding to the temperature of the black body.
+
+    """
+    return wien_constant * temperature**-1
+
+
+def solve(wavelength: Optional[float] = None,
+          temperature: Optional[float] = None) -> float:
+    """
+    Method to solve the Wien displacement law given one unknown.
+
+    Parameters
+    ----------
+    wavelength:
+        Wavelength of the object (in nanometer).
+    temperature:
+        Temperature of the object (in Kelvin).
+
+    Returns
+    -------
+    object:
+        Either the temperature of the black body or the wavelength of emission depending upon the unknown parameter.
+
+    """
+    w, w_, t = wavelength, wien_constant, temperature
+
+    return get_peak_wavelength(t) if w is None else w_ * w**-1
