@@ -1,60 +1,75 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Created on Tue Aug  3 17:53:44 2021
-
-@author: astrophysics and python
 """
 
-from numpy import pi
+from typing import Optional
+
+import numpy as np
+
+sigma_sb = 5.67037e-8
 
 
-class StefanBoltzamnnLaw:
+class RadiantFlux:
+    """
+    Class to determine the radiant flux from Stefan-Boltzmann law
+    """
 
     def __init__(self):
-        self.sigma_sb = 5.67037e-8
+        pass
 
-    class RadianFlux:
+    @staticmethod
+    def get_radiant_flux(temperature: float, emissivity: float) -> float:
+        """
+        Function to get the radiant flux value from Stefan-Boltzmann Law.
 
-        def __init__(self):
-            self.sigma_sb = StefanBoltzamnnLaw().sigma_sb
+        Parameters
+        ----------
+        temperature
+            The temperature of the black body.
+        emissivity
+            The emissivity of the black body.
 
-        def radiant_flux(self, temperature, emissivity):
-            return emissivity * self.sigma_sb * temperature**4
+        Returns
+        -------
+        float:
+            Radiant flux of the black body.
 
-        def solve(self, radiant_flux=None, temperature=None, emissivity=None):
-            if radiant_flux is None:
-                out = self.radiant_flux(temperature, emissivity)
-            elif temperature is None:
-                out = radiant_flux * (self.sigma_sb * emissivity)**-1
-                out = pow(out, 1/4)
-            elif emissivity is None:
-                out = radiant_flux * (self.sigma_sb * temperature**4)**-1
+        """
 
-            return out
+        e, s, t = emissivity, sigma_sb, temperature
 
-    class TotalPowerRadiated:
+        return e * s * t**4
 
-        def __init__(self):
-            self.sigma_sb = StefanBoltzamnnLaw().sigma_sb
+    def solve(self,
+              radiant_flux: Optional[float] = None,
+              temperature: Optional[float] = None,
+              emissivity: Optional[float] = None) -> Optional[float]:
+        r, s, t, e = radiant_flux, sigma_sb, temperature, emissivity
 
-        def total_power_radiated(self, radius_of_the_object, temperature, emissivity):
-            return 4 * pi * radius_of_the_object**2 * self.sigma_sb * temperature**4
+        return self.get_radiant_flux(t, e) if r is None else (r * (s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1 if e is None else None
 
-        def solve(self, total_power_radiated=None, radius_of_object=None, temperature=None, emissivity=None):
-            # 0.25 * P * (pi * e * sigma_sb)**-1 * r**-2 * T**-4 = 0
 
-            pre_calculated_terms = [None if total_power_radiated is None else 0.25 * total_power_radiated * (pi * self.sigma_sb)**-1][0]
+class TotalPowerRadiated:
 
-            if total_power_radiated is None:
-                out = self.total_power_radiated(radius_of_object, temperature, emissivity)
-            elif radius_of_object is None:
-                out = (pre_calculated_terms * emissivity**-1 * temperature**-4)**0.5
-            elif temperature is None:
-                out = (pre_calculated_terms * emissivity**-1 * radius_of_object**-2)**0.25
-            elif emissivity is None:
-                out = pre_calculated_terms * radius_of_object**-2 * temperature**-4
-            else:
-                out = None
+    def __init__(self):
+        pass
 
-            return out
+    @staticmethod
+    def get_total_power_radiated(radius_of_the_object: float,
+                                 temperature: float,
+                                 emissivity: float) -> float:
+        return 4 * np.pi * radius_of_the_object**2 * sigma_sb * temperature**4 * emissivity
+
+    def solve(self,
+              total_power_radiated: Optional[float] = None,
+              radius_of_object: Optional[float] = None,
+              temperature: Optional[float] = None,
+              emissivity: Optional[float] = None) -> Optional[float]:
+        # 0.25 * P * (pi * e * sigma_sb)**-1 * r**-2 * T**-4 = 0
+
+        tp, r, t, e, s = total_power_radiated, radius_of_object, temperature, emissivity, sigma_sb
+
+        _constants = None if tp is None else 0.25 * tp * (np.pi * s)**-1
+
+        return self.get_total_power_radiated(r, t, e) if tp is None else (_constants * e**-1 * t**-4)**0.5 if r is None else (_constants * e**-1 * r**-2)**0.25 if t is None else \
+            _constants * r**-2 * t**-4 if e is None else None
