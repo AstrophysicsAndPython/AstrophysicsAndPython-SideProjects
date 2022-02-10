@@ -12,12 +12,15 @@ class FromCelsius:
         self.convert_to = convert_to
 
     def _to_kelvin(self):
+        # C + 273.15
         return self.temperature + 273.15
 
     def _to_fahrenheit(self):
+        # (C * 1.8) + 32
         return (self.temperature * 1.8) + 32  # 9/5 = 1.8
 
     def _to_rankine(self):
+        # (C * 1.8) + 491.67
         return (self.temperature * 1.8) + 491.67
 
     def convert(self):
@@ -36,12 +39,15 @@ class FromKelvin:
         self.convert_to = convert_to
 
     def _to_celsius(self):
+        # K - 273.15
         return self.temperature - 273.15
 
     def _to_fahrenheit(self):
+        # (K - 273.15) * 1.8 + 32
         return (self._to_celsius() * 1.8) + 32
 
     def _to_rankine(self):
+        # K * 1.8
         return self.temperature * 1.8
 
     def convert(self):
@@ -60,12 +66,15 @@ class FromFahrenheit:
         self.convert_to = convert_to
 
     def _to_celsius(self):
-        return (self.temperature - 32) * 1.8
+        # (F - 32) / 1.8
+        return (self.temperature - 32) / 1.8
 
     def _to_kelvin(self):
+        # ((F - 32) / 1.8) + 273.15
         return self._to_celsius() + 273.15
 
     def _to_rankine(self):
+        # F + 459.67
         return self.temperature + 459.67
 
     def convert(self):
@@ -84,12 +93,15 @@ class FromRankine:
         self.convert_to = convert_to
 
     def _to_fahrenheit(self):
+        # R - 459.67
         return self.temperature - 459.67
 
     def _to_celsius(self):
-        return (self.temperature - 491.67) * 1.8
+        # (R - 391.67) / 1.8
+        return (self.temperature - 491.67) / 1.8
 
     def _to_kelvin(self):
+
         return self.temperature / 1.8
 
     def convert(self):
