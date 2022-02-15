@@ -11,13 +11,13 @@ sigma_sb = 5.67037e-8
 
 class RadiantFlux:
     """
-    Class to determine the radiant flux from Stefan-Boltzmann law. This class contains two methods,
+    Class to determine the radiant flux using Stefan-Boltzmann law. This class contains two methods,
 
     1- get_radiant_flux()
 
     2- solve()
 
-    The get_radiant_flux() method requires two float/int type arguments,
+    The get_radiant_flux() method requires two parameters,
 
     - temperature, and
     - emissivity.
@@ -28,19 +28,130 @@ class RadiantFlux:
     - temperature, and
     - emissivity.
 
-    One of the three can be left unknown. However, two must be specified as float/int type arguments.
+    One of the three can be left unknown. However, two must be specified as float type arguments.
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, temperature: Optional[float] = None, emissivity: Optional[float] = 1):
+        """
+        Initializer method for RadiantFlux class for Stefan-Boltzmann Law.
 
-    @staticmethod
-    def get_radiant_flux(temperature: float, emissivity: float) -> float:
+        Parameters
+        ----------
+        temperature
+            The temperature of the black body.
+        emissivity
+            The emissivity of the black body.
+        """
+        self.temperature = temperature
+        self.emissivity = emissivity
+
+    def get_radiant_flux(self) -> float:
+        """
+        Method to calculate the value for radiant flux from black body.
+
+        Returns
+        -------
+        float:
+            Value for radiant flux of the black body.
+
+        """
+        return self.emissivity * sigma_sb * self.temperature**4
+
+    def solve(self, radiant_flux: Optional[float] = None) -> float:
+        """
+        Solver method of Stefan-Boltzmann law for one of the three unknown variables.
+
+        Parameters
+        ----------
+        radiant_flux:
+            The radiant flux of the black body.
+
+        Returns
+        -------
+        float:
+            One of the three unknown parameters for Stefan-Boltzmann law.
+            
+        Notes
+        -------
+        Takes the temperature and emissivity parameter from the __init__ function
+
+        """
+        r, s, t, e = radiant_flux, sigma_sb, self.temperature, self.emissivity
+
+        # ensure we only have one unknown
+        if [r, t, e].count(None) > 1:
+            raise TypeError('Can\'t have more than one unknown variable.')
+
+        return self.get_radiant_flux() if r is None else (r * (s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1
+
+
+class TotalPowerRadiated:
+    """
+    Class to determine the total power radiated using Stefan-Boltzmann law. This class contains two methods,
+
+    1- get_total_power_radiated()
+
+    2- solve()
+
+    The get_total_power_radiated() method requires three parameters,
+
+    - radius_of_the_object,
+    - temperature, and
+    - emissivity.
+
+    Although solve() method requires four parameters,
+
+    - total_power_radiated,
+    - radius_of_the_object,
+    - temperature, and
+    - emissivity.
+
+    One of the four can be left unknown. However, three must be specified as float type arguments.
+    """
+
+    def __init__(self, radius_of_the_object: Optional[float], temperature: Optional[float] = None, emissivity: Optional[float] = 1):
+        """
+        Initializer method for TotalPowerRadiated class for Stefan-Boltzmann Law.
+
+        Parameters
+        ----------
+        radius_of_the_object
+            Radius of the emitting object/cavity. The object is assumed to be circular.
+        temperature
+            The temperature of the black body.
+        emissivity
+            The emissivity of the black body.
+        """
+        self.radius_of_the_object = radius_of_the_object
+        self.temperature = temperature
+        self.emissivity = emissivity
+
+    def get_total_power_radiated(self) -> float:
+        """
+        Method to calculate the value for total radiated power from black body.
+
+        Returns
+        -------
+        float:
+            Value for radiant flux of the black body.
+        """
+
+        return 4 * np.pi * self.radius_of_the_object**2 * sigma_sb * self.temperature**4 * self.emissivity
+
+    def solve(self,
+              total_power_radiated: Optional[float] = None,
+              radius_of_object: Optional[float] = None,
+              temperature: Optional[float] = None,
+              emissivity: Optional[float] = 1) -> Optional[float]:
         """
         Method to get the radiant flux value from Stefan-Boltzmann Law.
 
         Parameters
         ----------
+        total_power_radiated
+            Total power radiated by the black body
+        radius_of_object
+            Radius of the emitting object/cavity. The object is assumed to be circular.
         temperature
             The temperature of the black body.
         emissivity
@@ -49,62 +160,17 @@ class RadiantFlux:
         Returns
         -------
         float:
-            Radiant flux of the black body.
-
+            One of the four unknown parameters for Stefan-Boltzmann law.
         """
 
-        e, s, t = emissivity, sigma_sb, temperature
-
-        return e * s * t**4
-
-    def solve(self,
-              radiant_flux: Optional[float] = None,
-              temperature: Optional[float] = None,
-              emissivity: Optional[float] = None) -> Optional[float]:
-        """
-        Method to solve the Stefan-Boltzmann law for one of the three unknown variables.
-
-        Parameters
-        ----------
-        radiant_flux:
-            The radiant flux of the black body.
-        temperature:
-            The temperature of the black body
-        emissivity:
-            The emissivity parameter for the black body.
-
-        Returns
-        -------
-        object:
-            One of the three unknown parameters for Stefan-Boltzmann law.
-
-        """
-        r, s, t, e = radiant_flux, sigma_sb, temperature, emissivity
-
-        return self.get_radiant_flux(t, e) if r is None else (r * (s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1 if e is None else None
-
-
-class TotalPowerRadiated:
-
-    def __init__(self):
-        pass
-
-    @staticmethod
-    def get_total_power_radiated(radius_of_the_object: float,
-                                 temperature: float,
-                                 emissivity: float) -> float:
-        return 4 * np.pi * radius_of_the_object**2 * sigma_sb * temperature**4 * emissivity
-
-    def solve(self,
-              total_power_radiated: Optional[float] = None,
-              radius_of_object: Optional[float] = None,
-              temperature: Optional[float] = None,
-              emissivity: Optional[float] = None) -> Optional[float]:
         # 0.25 * P * (pi * e * sigma_sb)**-1 * r**-2 * T**-4 = 0
 
         tp, r, t, e, s = total_power_radiated, radius_of_object, temperature, emissivity, sigma_sb
 
-        _constants = None if tp is None else 0.25 * tp * (np.pi * s)**-1
+        # ensure we only have one unknown
+        if [tp, r, t, e].count(None) > 1:
+            raise TypeError('Can\'t have more than one unknown variable.')
 
-        return self.get_total_power_radiated(r, t, e) if tp is None else (_constants * e**-1 * t**-4)**0.5 if r is None else (_constants * e**-1 * r**-2)**0.25 if t is None else \
-            _constants * r**-2 * t**-4 if e is None else None
+        _c = None if tp is None else 0.25 * tp * (np.pi * s)**-1
+
+        return self.get_total_power_radiated() if tp is None else (_c * e**-1 * t**-4)**0.5 if r is None else (_c * e**-1 * r**-2)**0.25 if t is None else _c * r**-2 * t**-4
