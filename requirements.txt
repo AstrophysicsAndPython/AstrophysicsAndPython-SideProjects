@@ -1,0 +1,5 @@
+# NOTE: any changes in the requirements must also be reflected in
+#   - setup.cfg
+#   - environment.yml
+#   - install.rst
+numpy <= 1.21.4'
