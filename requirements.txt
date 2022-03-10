@@ -2,4 +2,4 @@
 #   - setup.cfg
 #   - environment.yml
 #   - install.rst
-numpy <= 1.21.4'
+numpy>=1.21.4
