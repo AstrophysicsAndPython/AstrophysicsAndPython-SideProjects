@@ -3,3 +3,6 @@
 #   - environment.yml
 #   - install.rst
 numpy>=1.21.4
+
+scipy>=1.7.3
+astropy>=4.3.1
