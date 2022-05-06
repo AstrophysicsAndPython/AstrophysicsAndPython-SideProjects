@@ -11,7 +11,8 @@ sigma_sb = 5.67037e-8
 
 class RadiantFlux:
     """
-    Class to determine the radiant flux using Stefan-Boltzmann law. This class contains two methods,
+    Class to determine the radiant flux using Stefan-Boltzmann law. This class contains
+    two methods,
 
     1- get_radiant_flux()
 
@@ -28,10 +29,12 @@ class RadiantFlux:
     - temperature, and
     - emissivity.
 
-    One of the three can be left unknown. However, two must be specified as float type arguments.
+    One of the three can be left unknown. However, two must be specified as float type
+    arguments.
     """
 
-    def __init__(self, temperature: Optional[float] = None, emissivity: Optional[float] = 1):
+    def __init__(self, temperature: Optional[float] = None,
+                 emissivity: Optional[float] = 1):
         """
         Initializer method for RadiantFlux class for Stefan-Boltzmann Law.
 
@@ -82,12 +85,14 @@ class RadiantFlux:
         if [r, t, e].count(None) > 1:
             raise TypeError('Can\'t have more than one unknown variable.')
 
-        return self.get_radiant_flux() if r is None else (r * (s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1
+        return self.get_radiant_flux() if r is None else (r * (
+                s * e)**-1)**0.25 if t is None else r * (s * t**4)**-1
 
 
 class TotalPowerRadiated:
     """
-    Class to determine the total power radiated using Stefan-Boltzmann law. This class contains two methods,
+    Class to determine the total power radiated using Stefan-Boltzmann law. This class
+    contains two methods,
 
     1- get_total_power_radiated()
 
@@ -106,10 +111,12 @@ class TotalPowerRadiated:
     - temperature, and
     - emissivity.
 
-    One of the four can be left unknown. However, three must be specified as float type arguments.
+    One of the four can be left unknown. However, three must be specified as float type
+    arguments.
     """
 
-    def __init__(self, radius_of_the_object: Optional[float], temperature: Optional[float] = None, emissivity: Optional[float] = 1):
+    def __init__(self, radius_of_the_object: Optional[float],
+                 temperature: Optional[float] = None, emissivity: Optional[float] = 1):
         """
         Initializer method for TotalPowerRadiated class for Stefan-Boltzmann Law.
 
@@ -136,7 +143,12 @@ class TotalPowerRadiated:
             Value for radiant flux of the black body.
         """
 
-        return 4 * np.pi * self.radius_of_the_object**2 * sigma_sb * self.temperature**4 * self.emissivity
+        s_, e, t, r = (sigma_sb,
+                       self.emissivity,
+                       self.temperature,
+                       self.radius_of_the_object)
+
+        return 4 * np.pi * r**2 * s_ * t**4 * e
 
     def solve(self,
               total_power_radiated: Optional[float] = None,
@@ -165,12 +177,25 @@ class TotalPowerRadiated:
 
         # 0.25 * P * (pi * e * sigma_sb)**-1 * r**-2 * T**-4 = 0
 
-        tp, r, t, e, s = total_power_radiated, radius_of_object, temperature, emissivity, sigma_sb
+        s_, e, t, r, tp = (sigma_sb,
+                           emissivity,
+                           temperature,
+                           radius_of_object,
+                           total_power_radiated)
 
         # ensure we only have one unknown
         if [tp, r, t, e].count(None) > 1:
             raise TypeError('Can\'t have more than one unknown variable.')
 
-        _c = None if tp is None else 0.25 * tp * (np.pi * s)**-1
+        _c = None if tp is None else 0.25 * tp * (np.pi * s_)**-1
 
-        return self.get_total_power_radiated() if tp is None else (_c * e**-1 * t**-4)**0.5 if r is None else (_c * e**-1 * r**-2)**0.25 if t is None else _c * r**-2 * t**-4
+        if tp is None:
+            out = self.get_total_power_radiated()
+        elif r is None:
+            out = (_c * e**-1 * t**-4)**0.5
+        elif t is None:
+            out = (_c * e**-1 * r**-2)**0.25
+        else:
+            out = _c * r**-2 * t**-4
+
+        return out
