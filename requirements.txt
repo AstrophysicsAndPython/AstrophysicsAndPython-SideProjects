@@ -2,4 +2,6 @@
 #   - setup.cfg
 #   - environment.yml
 #   - install.rst
-numpy>=1.21.5
+numpy~=1.21.5
+
+astropy~=5.1
