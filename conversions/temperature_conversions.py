@@ -2,284 +2,270 @@
 Created on Feb 09 23:38:17 2022
 """
 
-import conversion_error_base as ceb
+from typing import Union
+
+import numpy as np
 
 
 class FromCelsius:
-    """Conversion class from degree Celsius to one of Kelvin, degree Fahrenheit, or Rankine temperature scale.
+    """Conversion class from degree Celsius to one of degree Fahrenheit, Rankine, or Kelvin temperature scale.
 
-    FUNCTIONS
+    Parameters
     ----------
-    __init__(temperature: float, convert_to: str = 'F')
-        Class initializer function
+    temperature : float or list or ndarray
+        Measured temperature in degree Celsius.
+    convert_to : str, optional
+        Scale indicator, which temperature scale you want to convert to.
+        Valid inputs are 'F' (degree Fahrenheit), 'R' (Rankine), and 'K' (Kelvin).
+        Default is 'F'.
 
-    convert()
-        Convert function to convert degree Celsius temperature.
+    Attributes
+    ----------
+    temperature : float or ndarray
+        Measured temperature in degree Celsius.
+    convert_to : str
+        Scale indicator, which temperature scale you want to convert to.
 
     Examples
-    ----------
-    Convert 100 degree Celsius temperature to Kelvin, degree Fahrenheit, and Rankine scale.
+    --------
+    Convert 100 degree Celsius temperature to degree Fahrenheit, Rankine, and Kelvin scale.
 
     >>> FromCelsius(100, 'F').convert()
+    212.0
 
-    >>> FromCelsius(100, 'Kelvin').convert()
+    >>> FromCelsius(100, 'R').convert()
+    671.67
 
-    >>> FromCelsius(100, 'rankine').convert()
+    >>> FromCelsius(100, 'K').convert()
+    373.15
     """
 
-    def __init__(self, temperature: float, convert_to: str = 'F') -> None:
-        """
-
-        Parameters
-        ----------
-        temperature :
-            Measured temperature.
-        convert_to :
-            Scale indicator, which temperature scale you want to convert to.
-
-        Returns
-        -------
-        object:
-            Converted temperature from degree Celsius.
-
-        Notes
-        -------
-            convert_to variable takes either
-
-            - K, Kelvin
-            - F, degree Fahrenheit
-            - R, Rankine
-            as valid inputs. However, the string literal check in case-insensitive.
-        """
+    def __init__(self, temperature: Union[float, list, np.ndarray], convert_to: str = 'F'):
+        """Initialize the class."""
         self.temperature = temperature
         self.convert_to = convert_to
 
-    def _to_kelvin(self):
-        # C + 273.15
-        return self.temperature + 273.15
+    def check_input_type(self):
+        """Convert input temperature to a NumPy array if necessary."""
+        if isinstance(self.temperature, float):
+            self.temperature = np.array([self.temperature])
+        elif isinstance(self.temperature, list):
+            self.temperature = np.array(self.temperature)
 
-    def _to_fahrenheit(self):
-        # (C * 1.8) + 32
-        return (self.temperature * 1.8) + 32  # 9/5 = 1.8
+    def convert(self) -> Union[float, int, list, np.ndarray]:
+        """Convert the temperature from degree Celsius to the specified scale.
 
-    def _to_rankine(self):
-        # (C * 1.8) + 491.67
-        return (self.temperature * 1.8) + 491.67
+        Returns
+        -------
+        float or int or ndarray
+            Converted temperature.
+        """
+        self.check_input_type()
+        c = self.convert_to.lower()
 
-    def convert(self):
-        sep, convertible, _c = ', ', ['f', 'k', 'r', 'fahrenheit', 'kelvin', 'rankine'], self.convert_to.lower()
+        if c not in ['f', 'r', 'k']:
+            raise ValueError(f"Invalid temperature scale: {c}. Valid scales are 'F', 'R', and 'K'.")
 
-        if _c not in convertible:
-            ceb.raise_error(separator=sep, units=convertible)
+        func_map = {'f': (self.temperature * 1.8) + 32,
+                    'r': (self.temperature * 1.8) + 491.67,
+                    'k': self.temperature + 273.15}
 
-        return self._to_fahrenheit() if _c in ['f', 'fahrenheit'] else self._to_kelvin() if _c in ['k', 'kelvin'] else self._to_rankine()
+        return func_map[c]
 
 
 class FromKelvin:
     """Conversion class from Kelvin to one of degree Celsius, degree Fahrenheit, or Rankine temperature scale.
 
-    FUNCTIONS
+    Parameters
     ----------
-    __init__(temperature: float, convert_to: str = 'C')
-        Class initializer function
+    temperature : float or list or ndarray
+        Measured temperature in Kelvin.
+    convert_to : str, optional
+        Scale indicator, which temperature scale you want to convert to.
+        Valid inputs are 'C' (degree Celsius), 'F' (degree Fahrenheit), and 'R' (Rankine).
+        Default is 'C'.
 
-    convert()
-        Convert function to convert Kelvin temperature.
+    Attributes
+    ----------
+    temperature : float or ndarray
+        Measured temperature in Kelvin.
+    convert_to : str
+        Scale indicator, which temperature scale you want to convert to.
 
     Examples
-    ----------
+    --------
     Convert 100 Kelvin temperature to degree Celsius, degree Fahrenheit, and Rankine scale.
 
     >>> FromKelvin(100, 'C').convert()
+    -173.15
 
     >>> FromKelvin(100, 'f').convert()
+    -279.67
 
     >>> FromKelvin(100, 'rankine').convert()
+    180.0
     """
 
-    def __init__(self, temperature: float, convert_to: str = 'C'):
-        """
-
-        Parameters
-        ----------
-        temperature :
-            Measured temperature.
-        convert_to :
-            Scale indicator, which temperature scale you want to convert to.
-
-        Returns
-        -------
-        object:
-            Converted temperature from Kelvin.
-
-        Notes
-        -------
-            convert_to variable takes either
-
-            - C, degree Celsius
-            - F, degree Fahrenheit
-            - R, Rankine
-            as valid inputs. However, the string literal check in case-insensitive.
-        """
+    def __init__(self, temperature: Union[float, list, np.ndarray], convert_to: str = 'C'):
+        """Initialize the class."""
         self.temperature = temperature
         self.convert_to = convert_to
 
-    def _to_celsius(self):
-        # K - 273.15
-        return self.temperature - 273.15
+    def check_input_type(self):
+        """Convert input temperature to a NumPy array if necessary."""
+        if isinstance(self.temperature, float):
+            self.temperature = np.array([self.temperature])
+        elif isinstance(self.temperature, list):
+            self.temperature = np.array(self.temperature)
 
-    def _to_fahrenheit(self):
-        # (K - 273.15) * 1.8 + 32
-        return (self._to_celsius() * 1.8) + 32
+    def convert(self) -> np.ndarray:
+        """Convert the temperature from Kelvin to the specified scale.
 
-    def _to_rankine(self):
-        # K * 1.8
-        return self.temperature * 1.8
+        Returns
+        -------
+        ndarray
+            Converted temperature.
+        """
+        self.check_input_type()
+        k = self.convert_to.lower()
 
-    def convert(self):
-        sep, convertible, _c = ', ', ['c', 'f', 'r', 'celsius', 'fahrenheit', 'rankine'], self.convert_to.lower()
+        if k not in ['c', 'f', 'r']:
+            raise ValueError(f"Invalid temperature scale: {k.upper()}. Valid scales are 'C', 'F', and 'R'.")
 
-        if _c not in convertible:
-            ceb.raise_error(separator=sep, units=convertible)
+        func_map = {'c': self.temperature - 273.15,
+                    'f': (self.temperature - 273.15) * 1.8 + 32,
+                    'r': self.temperature * 1.8}
 
-        return self._to_celsius() if _c in ['c', 'celsius'] else self._to_fahrenheit() if _c in ['f', 'fahrenheit'] else self._to_rankine()
+        return func_map[k]
 
 
 class FromFahrenheit:
-    """Conversion class from degree Fahrenheit to one of degree Celsius, Kelvin, or Rankine temperature scale.
+    """Conversion class from degree Fahrenheit to one of degree Celsius, Rankine, or Kelvin temperature scale.
 
-    FUNCTIONS
+    Parameters
     ----------
-    __init__(temperature: float, convert_to: str = 'C')
-        Class initializer function
+    temperature : float or list or ndarray
+        Measured temperature in degree Fahrenheit.
+    convert_to : str, optional
+        Scale indicator, which temperature scale you want to convert to.
+        Valid inputs are 'C' (degree Celsius), 'R' (Rankine), and 'K' (Kelvin).
+        Default is 'C'.
 
-    convert()
-        Convert function to convert degree Fahrenheit temperature.
+    Attributes
+    ----------
+    temperature : float or ndarray
+        Measured temperature in degree Fahrenheit.
+    convert_to : str
+        Scale indicator, which temperature scale you want to convert to.
 
     Examples
-    ----------
-    Convert 100 degree Fahrenheit temperature to degree Celsius, Kelvin, and Rankine scale.
+    --------
+    Convert 100 degree Fahrenheit temperature to degree Celsius, Rankine, and Kelvin scale.
 
     >>> FromFahrenheit(100, 'C').convert()
+    37.78
 
-    >>> FromFahrenheit(100, 'Kelvin').convert()
+    >>> FromFahrenheit(100, 'R').convert()
+    559.67
 
-    >>> FromFahrenheit(100, 'rankine').convert()
+    >>> FromFahrenheit(100, 'K').convert()
+    310.928
     """
 
-    def __init__(self, temperature: float, convert_to: str = 'C'):
-        """
-
-        Parameters
-        ----------
-        temperature :
-            Measured temperature.
-        convert_to :
-            Scale indicator, which temperature scale you want to convert to.
-
-        Returns
-        -------
-        object:
-            Converted temperature from degree Fahrenheit.
-
-        Notes
-        -------
-            convert_to variable takes either
-
-            - C, degree Celsius
-            - K, Kelvin
-            - R, Rankine
-            as valid inputs. However, the string literal check in case-insensitive.
-        """
+    def __init__(self, temperature: Union[float, list, np.ndarray], convert_to: str = 'C'):
+        """Initialize the class."""
         self.temperature = temperature
         self.convert_to = convert_to
 
-    def _to_celsius(self):
-        # (F - 32) / 1.8
-        return (self.temperature - 32) / 1.8
+    def check_input_type(self):
+        """Convert input temperature to a NumPy array if necessary."""
+        if isinstance(self.temperature, float):
+            self.temperature = np.array([self.temperature])
+        elif isinstance(self.temperature, list):
+            self.temperature = np.array(self.temperature)
 
-    def _to_kelvin(self):
-        # ((F - 32) / 1.8) + 273.15
-        return self._to_celsius() + 273.15
+    def convert(self) -> np.ndarray:
+        """Convert the temperature from degree Fahrenheit to the specified scale.
 
-    def _to_rankine(self):
-        # F + 459.67
-        return self.temperature + 459.67
+        Returns
+        -------
+        ndarray
+            Converted temperature.
+        """
+        self.check_input_type()
+        f = self.convert_to.lower()
 
-    def convert(self):
-        sep, convertible, _c = ', ', ['c', 'k', 'r', 'celsius', 'kelvin', 'rankine'], self.convert_to.lower()
+        if f not in ['c', 'k', 'r']:
+            raise ValueError(f"Invalid temperature scale: {f.upper()}. Valid scales are 'C', 'K', and 'R'.")
 
-        if _c not in convertible:
-            ceb.raise_error(separator=sep, units=convertible)
+        func_map = {'c': (self.temperature - 32) * 1.8,
+                    'k': (self.temperature - 32) * 1.8 + 273.15,
+                    'r': self.temperature + 459.67}
 
-        return self._to_celsius() if _c in ['c', 'celsius'] else self._to_kelvin() if _c in ['k', 'kelvin'] else self._to_rankine()
+        return func_map[f]
 
 
 class FromRankine:
-    """Conversion class from Rankine to one of degree Celsius, degree Fahrenheit, or Kelvin temperature scale.
+    """Conversion class from Rankine to one of degree Fahrenheit, degree Celsius, or Kelvin temperature scale.
 
-    FUNCTIONS
+    Parameters
     ----------
-    __init__(temperature: float, convert_to: str = 'C')
-        Class initializer function
+    temperature : float or list or ndarray
+        Measured temperature in Rankine.
+    convert_to : str, optional
+        Scale indicator, which temperature scale you want to convert to.
+        Valid inputs are 'F' (degree Fahrenheit), 'C' (degree Celsius), and 'K' (Kelvin).
+        Default is 'F'.
 
-    convert()
-        Convert function to convert Rankine temperature.
+    Attributes
+    ----------
+    temperature : float or ndarray
+        Measured temperature in Rankine.
+    convert_to : str
+        Scale indicator, which temperature scale you want to convert to.
 
     Examples
-    ----------
-    Convert 100 Rankine temperature to degree Celsius, degree Fahrenheit, and Kelvin scale.
-
-    >>> FromRankine(100, 'C').convert()
+    --------
+    Convert 100 Rankine temperature to degree Fahrenheit, degree Celsius, and Kelvin scale.
 
     >>> FromRankine(100, 'F').convert()
+    180.0
 
-    >>> FromRankine(100, 'Kevlin').convert()
+    >>> FromRankine(100, 'C').convert()
+    -272.594
+
+    >>> FromRankine(100, 'K').convert()
+    55.56
     """
 
-    def __init__(self, temperature: float, convert_to: str = 'C'):
-        """
-
-        Parameters
-        ----------
-        temperature :
-            Measured temperature.
-        convert_to :
-            Scale indicator, which temperature scale you want to convert to.
-
-        Returns
-        -------
-        object:
-            Converted temperature from Rankine.
-
-        Notes
-        -------
-            convert_to variable takes either
-
-            - C, degree Celsius
-            - K, Kelvin
-            - F, degree Fahrenheit
-            as valid inputs. However, the string literal check in case-insensitive.
-        """
+    def __init__(self, temperature: Union[float, list, np.ndarray], convert_to: str = 'F'):
+        """Initialize the class."""
         self.temperature = temperature
         self.convert_to = convert_to
 
-    def _to_fahrenheit(self):
-        # R - 459.67
-        return self.temperature - 459.67
+    def check_input_type(self):
+        """Convert input temperature to a NumPy array if necessary."""
+        if isinstance(self.temperature, float):
+            self.temperature = np.array([self.temperature])
+        elif isinstance(self.temperature, list):
+            self.temperature = np.array(self.temperature)
 
-    def _to_celsius(self):
-        # (R - 391.67) / 1.8
-        return (self.temperature - 491.67) / 1.8
+    def convert(self) -> np.ndarray:
+        """Convert the temperature from Rankine to the specified scale.
 
-    def _to_kelvin(self):
+        Returns
+        -------
+        ndarray
+            Converted temperature.
+        """
+        self.check_input_type()
+        r = self.convert_to.lower()
 
-        return self.temperature / 1.8
+        if r not in ['c', 'f', 'k']:
+            raise ValueError(f"Invalid temperature scale: {r.upper()}. Valid scales are 'C', 'F', and 'K'.")
 
-    def convert(self):
-        sep, convertible, _c = ', ', ['c', 'k', 'f', 'celsius', 'kelvin', 'fahrenheit'], self.convert_to.lower()
+        func_map = {'c': (self.temperature - 491.67) * 1.8,
+                    'f': self.temperature - 459.67,
+                    'k': self.temperature * 1.8}
 
-        if _c not in convertible:
-            ceb.raise_error(separator=sep, units=convertible)
-
-        return self._to_celsius() if _c in ['c', 'celsius'] else self._to_kelvin() if _c in ['k', 'kelvin'] else self._to_fahrenheit()
+        return func_map[r]
